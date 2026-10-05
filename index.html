@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1F5C4D">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" href="./icon-192.png">
+<link rel="apple-touch-icon" href="./icon-192.png">
+<title>Полевой дневник</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Literata:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#ECEFEA; --surface:#F8FAF6; --ink:#16221C; --muted:#56655B; --line:#C9D2C9; --soft:#DDE4DB;
+  --accent:#1F5C4D; --on-accent:#FFFFFF; --warn:#6E4800; --warnbg:#F4E6C3; --bad:#A3271F; --good:#1F6B3A;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --paper:#101914; --surface:#17231C; --ink:#E6EEE8; --muted:#9DB0A3; --line:#2B3E32; --soft:#1E2D24;
+    --accent:#6FC3A8; --on-accent:#0F1A14; --warn:#E9C46A; --warnbg:#3A3016; --bad:#F0877E; --good:#7BD39A;
+  }
+}
+*,*::before,*::after{box-sizing:border-box}
+html{font-size:17px;-webkit-text-size-adjust:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.5}
+button,input,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.wrap{max-width:46rem;margin:0 auto;padding:1rem 1rem 6.5rem}
+h1,h2,h3{margin:0;line-height:1.25;font-weight:600}
+h2{font-size:1.4rem;margin-bottom:.4rem}
+h3{font-size:1.05rem;margin-bottom:.3rem}
+p{margin:0 0 .8rem}
+.muted{color:var(--muted)}
+.small{font-size:.88rem}
+.serif{font-family:Literata,Georgia,serif}
+.top{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.2rem 0 1rem}
+.brand{display:flex;align-items:center;gap:.6rem;font-family:Literata,Georgia,serif;font-size:1.35rem;font-weight:600}
+.brand svg{width:1.9rem;height:1.9rem;color:var(--accent)}
+.chip{font-size:.8rem;padding:.15rem .6rem;border:1px solid var(--line);border-radius:99px;color:var(--muted)}
+.tabs{position:fixed;left:0;right:0;bottom:0;display:flex;background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px);z-index:20}
+.tabs button{flex:1;padding:.75rem .1rem;background:none;border:0;border-top:3px solid transparent;color:var(--muted);font-size:.85rem;cursor:pointer}
+.tabs button[aria-current="page"]{color:var(--accent);border-top-color:var(--accent);font-weight:600}
+@media (min-width:760px){
+  .tabs{position:static;background:none;border:0;border-bottom:1px solid var(--line);margin-bottom:1.2rem;padding:0}
+  .tabs button{flex:none;padding:.7rem 1.1rem;font-size:1rem;border-top:0;border-bottom:3px solid transparent;margin-bottom:-1px}
+  .tabs button[aria-current="page"]{border-bottom-color:var(--accent)}
+  .wrap{padding-bottom:3rem}
+}
+.btn{padding:.6rem 1rem;border-radius:.45rem;border:1px solid var(--line);background:var(--surface);cursor:pointer;min-height:2.7rem;font-size:.95rem}
+.btn:hover:not([disabled]){border-color:var(--accent)}
+.btn[disabled]{opacity:.5;cursor:default}
+.btn.primary{background:var(--accent);color:var(--on-accent);border-color:var(--accent);font-weight:500}
+.btn.sm{padding:.3rem .7rem;min-height:2.2rem;font-size:.85rem}
+.btn.danger{color:var(--bad)}
+.row{display:flex;gap:.6rem;flex-wrap:wrap;align-items:center}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:.55rem;padding:1rem 1.1rem;margin-bottom:1rem}
+.warn{background:var(--warnbg);color:var(--warn);border-radius:.45rem;padding:.7rem .9rem;font-size:.9rem;margin-bottom:1rem}
+.seg{display:flex;border:1px solid var(--line);border-radius:.45rem;overflow:hidden;margin-bottom:1rem}
+.seg button{flex:1;background:var(--surface);border:0;padding:.6rem .3rem;cursor:pointer;font-size:.9rem}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--on-accent);font-weight:500}
+.big{display:grid;grid-template-columns:1fr 1fr;gap:.7rem;margin-bottom:1rem}
+.big .btn{min-height:5rem;font-size:1.05rem}
+.fld{display:block;margin-bottom:.8rem;font-size:.88rem;color:var(--muted)}
+.fld input,.fld textarea,.inp{display:block;width:100%;margin-top:.25rem;padding:.6rem .7rem;border:1px solid var(--line);border-radius:.45rem;background:var(--paper);color:var(--ink);font-size:1rem}
+textarea{min-height:5rem;resize:vertical}
+.preview{display:block;width:100%;max-height:45vh;object-fit:contain;background:var(--soft);border-radius:.55rem;margin-bottom:1rem}
+.eng{display:grid;grid-template-columns:1fr auto;gap:.2rem .8rem;align-items:center;padding:.7rem 0;border-bottom:1px solid var(--line)}
+.eng:last-child{border-bottom:0}
+.eng b{font-weight:600}
+.eng .why{grid-column:1/-1;font-size:.85rem;color:var(--muted)}
+.eng .err{grid-column:1/-1;font-size:.88rem;color:var(--bad)}
+.cand{padding:.7rem 0;border-bottom:1px solid var(--line)}
+.cand:last-child{border-bottom:0}
+.cand .nm{font-family:Literata,Georgia,serif;font-size:1.15rem;font-weight:600}
+.cand .lt{font-family:Literata,Georgia,serif;font-style:italic;color:var(--muted)}
+.bar{height:.5rem;background:var(--soft);border-radius:99px;overflow:hidden;margin:.35rem 0 .5rem}
+.bar i{display:block;height:100%;background:var(--accent)}
+.check{border-left:3px solid var(--accent);padding:.2rem 0 .2rem .9rem;margin-top:.8rem}
+.check img{float:right;width:5.5rem;height:5.5rem;object-fit:cover;border-radius:.4rem;margin:0 0 .5rem .8rem}
+.obs{display:grid;grid-template-columns:5.5rem 1fr;gap:.8rem;padding:.9rem 0;border-bottom:1px solid var(--line)}
+.obs:last-child{border-bottom:0}
+.obs img{width:5.5rem;height:5.5rem;object-fit:cover;border-radius:.45rem;background:var(--soft)}
+.obs .nm{font-family:Literata,Georgia,serif;font-size:1.15rem;font-weight:600;line-height:1.25}
+.obs .lt{font-family:Literata,Georgia,serif;font-style:italic;color:var(--muted)}
+.empty{color:var(--muted);padding:1rem 0}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(5rem + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--paper);padding:.55rem 1rem;border-radius:.45rem;z-index:40;font-size:.95rem;max-width:90vw}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 26C6 13 13 6 27 5C27 19 20 26 8 26"/><path d="M6 26L19 13"/></svg>
+      Полевой дневник
+    </div>
+    <span class="chip" id="net">онлайн</span>
+  </header>
+  <nav class="tabs" id="tabs" aria-label="Разделы">
+    <button data-tab="id">Определить</button>
+    <button data-tab="diary">Дневник</button>
+    <button data-tab="set">Настройки</button>
+  </nav>
+  <main>
+    <section id="v-id"></section>
+    <section id="v-diary" hidden></section>
+    <section id="v-set" hidden></section>
+  </main>
+</div>
+<input type="file" id="fCam" accept="image/*" capture="environment" hidden>
+<input type="file" id="fGal" accept="image/*" hidden>
+<div class="toast" id="toast" hidden role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+'use strict';
+var $=function(s){return document.querySelector(s);};
+var esc=function(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});};
+var KINDS={plant:'Растение',animal:'Животное',mineral:'Минерал',other:'Другое'};
+
+/* ---------- Settings (localStorage, per device) ---------- */
+var S={pnKey:'',online:false,kind:'plant'};
+try{var raw=localStorage.getItem('fd.settings');if(raw){var o=JSON.parse(raw);for(var k in o)S[k]=o[k];}}catch(e){}
+function saveSet(){try{localStorage.setItem('fd.settings',JSON.stringify(S));}catch(e){}}
+
+/* ---------- Diary storage (IndexedDB, stores photos as blobs) ---------- */
+var dbp=new Promise(function(res,rej){
+  try{
+    var r=indexedDB.open('fielddiary',1);
+    r.onupgradeneeded=function(){r.result.createObjectStore('obs',{keyPath:'id'});};
+    r.onsuccess=function(){res(r.result);};
+    r.onerror=function(){rej(r.error);};
+  }catch(e){rej(e);}
+});
+function tx(mode,fn){
+  return dbp.then(function(db){return new Promise(function(res,rej){
+    var t=db.transaction('obs',mode),rq=fn(t.objectStore('obs'));
+    t.oncomplete=function(){res(rq&&rq.result);};t.onerror=function(){rej(t.error);};
+  });});
+}
+var diary=[],urls=[],confirmId=null,dq='';
+function loadDiary(){return tx('readonly',function(s){return s.getAll();}).then(function(a){diary=(a||[]).sort(function(x,y){return y.ts-x.ts;});}).catch(function(){diary=[];});}
+
+/* ---------- State ---------- */
+var view='id',cur=null,deferredInstall=null;
+var toastT;
+function toast(m){var t=$('#toast');t.textContent=m;t.hidden=false;clearTimeout(toastT);toastT=setTimeout(function(){t.hidden=true;},2400);}
+function setView(v){view=v;render();window.scrollTo(0,0);}
+function render(){
+  ['id','diary','set'].forEach(function(v){$('#v-'+v).hidden=(v!==view);});
+  document.querySelectorAll('#tabs button').forEach(function(b){if(b.dataset.tab===view)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');});
+  ({id:renderId,diary:renderDiary,set:renderSet})[view]();
+}
+function netChip(){var c=$('#net');c.textContent=navigator.onLine?'онлайн':'офлайн';}
+window.addEventListener('online',netChip);window.addEventListener('offline',netChip);netChip();
+
+/* ---------- Image prep ---------- */
+function prep(file){
+  return new Promise(function(res,rej){
+    var img=new Image(),u=URL.createObjectURL(file);
+    img.onload=function(){
+      var m=1280,w=img.naturalWidth,h=img.naturalHeight,k=Math.min(1,m/Math.max(w,h));
+      var c=document.createElement('canvas');c.width=Math.round(w*k);c.height=Math.round(h*k);
+      c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+      c.toBlob(function(b){URL.revokeObjectURL(u);if(b)res(b);else rej(new Error('blob'));},'image/jpeg',0.82);
+    };
+    img.onerror=function(){URL.revokeObjectURL(u);rej(new Error('img'));};
+    img.src=u;
+  });
+}
+function onFile(file){
+  if(!file)return;
+  prep(file).then(function(b){
+    if(cur&&cur.url)URL.revokeObjectURL(cur.url);
+    cur={blob:b,url:URL.createObjectURL(b),kind:S.kind,cands:[],busy:'',msg:{},name:'',latin:'',note:'',geo:null,check:null,checking:false,src:''};
+    setView('id');
+  }).catch(function(){toast('Не удалось открыть фото');});
+}
+
+/* ---------- Engines ---------- */
+function askPlantnet(){
+  if(!cur)return;
+  cur.busy='plantnet';cur.msg.plantnet='';render();
+  var fd=new FormData();fd.append('images',cur.blob,'photo.jpg');fd.append('organs','auto');
+  var url='https://my-api.plantnet.org/v2/identify/all?api-key='+encodeURIComponent(S.pnKey)+'&lang=ru&nb-results=5&include-related-images=false';
+  fetch(url,{method:'POST',body:fd}).then(function(r){
+    if(r.status===401||r.status===403)throw new Error('Ключ не принят. Проверьте его в настройках.');
+    if(r.status===404)throw new Error('Pl@ntNet не нашёл подходящих растений на этом фото. Попробуйте другой ракурс: лист, цветок, плод.');
+    if(r.status===429)throw new Error('Дневной лимит запросов исчерпан. Он обновится в полночь по UTC.');
+    if(!r.ok)throw new Error('Сервис ответил с ошибкой '+r.status+'.');
+    return r.json();
+  }).then(function(j){
+    var add=(j.results||[]).map(function(x){
+      var sp=x.species||{},cn=(sp.commonNames||[])[0];
+      return {name:cn||sp.scientificNameWithoutAuthor||'?',latin:sp.scientificNameWithoutAuthor||'',score:x.score||0,src:'Pl@ntNet'};
+    });
+    cur.cands=cur.cands.filter(function(c){return c.src!=='Pl@ntNet';}).concat(add);
+    cur.msg.plantnet=add.length?'':'Вариантов нет.';
+  }).catch(function(e){
+    cur.msg.plantnet=(e&&e.message&&e.message.indexOf('Failed to fetch')<0)?e.message:'Не удалось связаться с Pl@ntNet. Возможно, нет интернета или сервис не разрешает запросы из браузера. Напишите об этом в чат, это важный результат проверки.';
+  }).then(function(){cur.busy='';render();});
+}
+function toLens(){
+  if(!cur)return;
+  var f=new File([cur.blob],'photo.jpg',{type:'image/jpeg'});
+  if(navigator.canShare&&navigator.canShare({files:[f]})){
+    navigator.share({files:[f],title:'Определить по фото'}).catch(function(e){
+      if(e&&e.name==='AbortError')return;
+      window.open('https://lens.google.com/','_blank','noopener');toast('Загрузите фото на открывшейся странице');
+    });
+  }else{
+    window.open('https://lens.google.com/','_blank','noopener');toast('Загрузите фото на открывшейся странице');
+  }
+}
+function fetchJson(u){return fetch(u).then(function(r){if(!r.ok)throw new Error(r.status);return r.json();});}
+function verify(name){
+  if(!cur)return;
+  cur.checking=true;cur.check=null;render();
+  var out={name:name,gbif:null,wiki:null};
+  var g=fetchJson('https://api.gbif.org/v1/species/match?name='+encodeURIComponent(name)).then(function(j){out.gbif=j;}).catch(function(){out.gbifErr=true;});
+  var slug=encodeURIComponent(name.replace(/ /g,'_'));
+  var w=fetchJson('https://ru.wikipedia.org/api/rest_v1/page/summary/'+slug).catch(function(){return fetchJson('https://en.wikipedia.org/api/rest_v1/page/summary/'+slug);}).then(function(j){out.wiki=j;}).catch(function(){});
+  Promise.all([g,w]).then(function(){cur.check=out;cur.checking=false;render();});
+}
+
+/* ---------- Views ---------- */
+var SAFETY='<div class="warn">Результат — это предположение, а не диагноз. Не используйте приложение, чтобы решать, что съедобно или безопасно: грибы, ягоды, дикие растения, змеи и пауки. При сомнении не трогайте и не ешьте.</div>';
+function renderId(){
+  var el=$('#v-id');
+  var seg='<div class="seg" role="group" aria-label="Что определяем">'+Object.keys(KINDS).map(function(k){
+    var on=(cur?cur.kind:S.kind)===k;return '<button data-act="kind" data-k="'+k+'" aria-pressed="'+on+'">'+KINDS[k]+'</button>';}).join('')+'</div>';
+  if(!cur){
+    el.innerHTML='<h2>Определить</h2><p class="muted">Выберите, что вы фотографируете, и сделайте снимок. Для растения снимайте лист, цветок или плод крупно, на однородном фоне.</p>'+seg+
+      '<div class="big"><button class="btn primary" data-act="cam">Сфотографировать</button><button class="btn" data-act="gal">Выбрать из галереи</button></div>'+SAFETY;
+    return;
+  }
+  var k=cur.kind,h='<div class="row" style="margin-bottom:.8rem"><button class="btn sm" data-act="reset">← Другое фото</button></div><img class="preview" src="'+cur.url+'" alt="Ваше фото">'+seg+SAFETY;
+  /* engines */
+  var pnWhy='',pnOk=false;
+  if(k!=='plant')pnWhy='Работает только для растений.';
+  else if(!S.online)pnWhy='Выключено: фото уходит на внешний сервер. Включите в настройках.';
+  else if(!S.pnKey)pnWhy='Нужен бесплатный ключ. Введите его в настройках.';
+  else pnOk=true;
+  h+='<div class="panel"><h3>Откуда взять варианты</h3>'+
+   '<div class="eng"><div><b>Локальная модель</b></div><button class="btn sm" disabled>Скоро</button><div class="why">Работает без интернета. Подключим на следующем этапе.</div></div>'+
+   '<div class="eng"><div><b>Pl@ntNet, растения</b></div><button class="btn sm" data-act="plantnet"'+(pnOk&&!cur.busy?'':' disabled')+'>'+(cur.busy==='plantnet'?'Ждём ответ…':'Спросить')+'</button>'+(pnWhy?'<div class="why">'+pnWhy+'</div>':'')+(cur.msg.plantnet?'<div class="err">'+esc(cur.msg.plantnet)+'</div>':'')+'</div>'+
+   '<div class="eng"><div><b>Google Lens</b></div><button class="btn sm" data-act="lens">Открыть</button><div class="why">Фото передаётся в Google только по вашему нажатию. Результат вы смотрите сами.</div></div>'+
+   '<div class="eng"><div><b>Второе мнение от Claude</b></div><button class="btn sm" disabled>Скоро</button></div></div>';
+  if(k==='mineral')h+='<div class="panel"><h3>Минералы</h3><p class="muted" style="margin:0">По одному фото камень определить трудно. На этапе 3 здесь появится определитель по свойствам: твёрдость, цвет черты, блеск, реакция на магнит и кислоту. Пока можно сохранить находку в дневник.</p></div>';
+  /* candidates */
+  h+='<div class="panel"><h3>Варианты</h3>';
+  if(!cur.cands.length)h+='<p class="muted small">Пока пусто. Получите варианты выше или введите название сами.</p>';
+  cur.cands.forEach(function(c,i){
+    h+='<div class="cand"><div class="nm">'+esc(c.name)+'</div>'+(c.latin?'<div class="lt">'+esc(c.latin)+'</div>':'')+
+      (c.score?'<div class="bar" aria-hidden="true"><i style="width:'+Math.round(c.score*100)+'%"></i></div><div class="small muted" style="margin-bottom:.4rem">Уверенность '+Math.round(c.score*100)+'%, источник: '+esc(c.src)+'</div>':'<div class="small muted" style="margin:.3rem 0">Источник: '+esc(c.src)+'</div>')+
+      '<div class="row"><button class="btn sm" data-act="verify" data-i="'+i+'">Проверить</button><button class="btn sm primary" data-act="pick" data-i="'+i+'">Выбрать</button></div></div>';
+  });
+  h+='<div class="row" style="margin-top:.8rem"><input class="inp" id="man" style="flex:1;min-width:10rem;margin:0" placeholder="Знаете название? Введите"><button class="btn sm" data-act="addcand">Добавить</button></div>';
+  if(cur.checking)h+='<p class="muted small" style="margin-top:.8rem">Проверяем по открытым базам…</p>';
+  if(cur.check)h+=checkHTML(cur.check);
+  h+='<p class="muted small" style="margin:.8rem 0 0">Проверка отправляет в интернет только название, не фото. Источники: GBIF и Wikipedia.</p></div>';
+  /* save */
+  h+='<div class="panel"><h3>В дневник</h3>'+
+   '<label class="fld">Название<input id="sName" value="'+esc(cur.name)+'" placeholder="Например: Дуб черешчатый" autocomplete="off"></label>'+
+   '<label class="fld">Латинское название (по желанию)<input id="sLat" value="'+esc(cur.latin)+'" autocomplete="off"></label>'+
+   '<label class="fld">Заметка<textarea id="sNote" placeholder="Где нашли, что заметили">'+esc(cur.note)+'</textarea></label>'+
+   '<div class="row"><button class="btn" data-act="geo">'+(cur.geo?'Место добавлено ✓':'Добавить место')+'</button><button class="btn primary" data-act="save">Сохранить в дневник</button></div></div>';
+  el.innerHTML=h;
+}
+function checkHTML(c){
+  var g=c.gbif,h='<div class="check"><b>'+esc(c.name)+'</b>';
+  if(c.gbifErr)h+='<p class="small muted" style="margin:.3rem 0">GBIF сейчас недоступен.</p>';
+  else if(!g||g.matchType==='NONE'||!g.usageKey)h+='<p class="small" style="margin:.3rem 0">GBIF: такого научного названия не нашли. Проверьте написание или введите латинское название.</p>';
+  else h+='<p class="small" style="margin:.3rem 0">GBIF: найдено «'+esc(g.canonicalName||g.scientificName)+'», ранг '+esc(g.rank||'?')+', статус '+esc(g.status||'?')+(g.status==='SYNONYM'?' (устаревшее название)':'')+(g.kingdom?', царство '+esc(g.kingdom):'')+(g.family?', семейство '+esc(g.family):'')+'. Точность совпадения: '+esc(g.confidence)+'%.</p>';
+  var w=c.wiki;
+  if(w&&w.extract){
+    var ex=w.extract.length>340?w.extract.slice(0,340)+'…':w.extract;
+    var link=w.content_urls&&w.content_urls.desktop?w.content_urls.desktop.page:'';
+    h+=(w.thumbnail&&w.thumbnail.source?'<img src="'+esc(w.thumbnail.source)+'" alt="">':'')+'<p class="small" style="margin:.3rem 0">'+esc(ex)+'</p>'+(link?'<a class="small" href="'+esc(link)+'" target="_blank" rel="noopener">Читать в Wikipedia</a>':'');
+  }else h+='<p class="small muted" style="margin:.3rem 0">Статью в Wikipedia не нашли.</p>';
+  return h+'<div style="clear:both"></div></div>';
+}
+
+function renderDiary(){
+  var el=$('#v-diary');
+  urls.forEach(function(u){URL.revokeObjectURL(u);});urls=[];
+  var q=dq.toLowerCase();
+  var list=diary.filter(function(o){return !q||(o.name+' '+o.latin+' '+o.note).toLowerCase().indexOf(q)>=0;});
+  var rows=list.map(function(o){
+    var u=URL.createObjectURL(o.photo);urls.push(u);
+    var d=new Date(o.ts).toLocaleDateString('ru-RU',{day:'numeric',month:'long',year:'numeric'});
+    var geo=o.geo?' <a class="small" target="_blank" rel="noopener" href="https://www.openstreetmap.org/?mlat='+o.geo.lat+'&mlon='+o.geo.lon+'#map=15/'+o.geo.lat+'/'+o.geo.lon+'">на карте</a>':'';
+    return '<div class="obs"><img src="'+u+'" alt="'+esc(o.name)+'"><div><div class="nm">'+esc(o.name)+'</div>'+(o.latin?'<div class="lt">'+esc(o.latin)+'</div>':'')+
+      '<div class="small muted">'+esc(KINDS[o.kind]||'')+', '+d+geo+'</div>'+(o.note?'<p class="small" style="margin:.3rem 0">'+esc(o.note)+'</p>':'')+
+      '<button class="btn sm danger" data-act="del" data-id="'+o.id+'">'+(confirmId===o.id?'Точно удалить?':'Удалить')+'</button></div></div>';
+  }).join('');
+  el.innerHTML='<h2>Дневник</h2><p class="muted">Ваши находки хранятся только на этом телефоне. Записей: '+diary.length+'.</p>'+
+    (diary.length?'<div class="row" style="margin-bottom:.8rem"><input class="inp" id="dq" style="flex:1;margin:0" placeholder="Поиск" value="'+esc(dq)+'"><button class="btn sm" data-act="exp">Скопировать список</button></div>':'')+
+    '<div class="panel" style="padding-top:.2rem;padding-bottom:.2rem">'+(rows||'<p class="empty">Пока пусто. Определите что-нибудь и сохраните находку.</p>')+'</div>';
+}
+
+function renderSet(){
+  var el=$('#v-set');
+  el.innerHTML='<h2>Настройки</h2>'+
+   '<div class="panel"><h3>Онлайн-проверка растений (Pl@ntNet)</h3><p class="muted small">Бесплатный ключ выдаётся после регистрации на my.plantnet.org, лимит до 500 распознаваний в день. Ключ хранится только на этом телефоне. Никогда не вставляйте его в файлы репозитория.</p>'+
+   '<label class="fld">Ключ API<input id="pnKey" type="password" value="'+esc(S.pnKey)+'" autocomplete="off" autocapitalize="off" spellcheck="false"></label>'+
+   '<label class="row small" style="margin-bottom:.8rem;align-items:flex-start"><input type="checkbox" id="onl" '+(S.online?'checked':'')+' style="width:1.3rem;height:1.3rem;margin-top:.1rem"><span>Разрешить отправлять фото на Pl@ntNet. Фото уходит на внешний сервер, только когда вы нажимаете «Спросить».</span></label>'+
+   '<button class="btn primary" data-act="saveset">Сохранить</button></div>'+
+   '<div class="panel"><h3>Установка</h3><p class="muted small">Приложение можно поставить на экран телефона, и оно будет открываться как обычное, в том числе без интернета.</p>'+
+   '<button class="btn" data-act="install" id="instBtn"'+(deferredInstall?'':' hidden')+'>Установить приложение</button>'+(deferredInstall?'':'<p class="small muted" style="margin:0">Если кнопки нет, откройте меню Chrome и выберите «Установить приложение» или «Добавить на главный экран».</p>')+'</div>'+
+   '<div class="panel"><h3>О приложении</h3><p class="small muted">Версия 0.1, каркас. Данные дневника, фото и настройки хранятся на устройстве. Под капотом: GBIF и Wikipedia для сверки названий. Для распознавания растений используется сервис Pl@ntNet: распознавание по фото основано на API Pl@ntNet, доступном на my.plantnet.org.</p><p class="small muted" style="margin:0" id="stor"></p></div>';
+  if(navigator.storage&&navigator.storage.estimate)navigator.storage.estimate().then(function(e){var s=$('#stor');if(s)s.textContent='Занято на устройстве: '+(e.usage/1048576).toFixed(1)+' МБ.';});
+}
+
+/* ---------- Events ---------- */
+document.addEventListener('click',function(e){
+  var tb=e.target.closest&&e.target.closest('#tabs button');
+  if(tb){setView(tb.dataset.tab);return;}
+  var b=e.target.closest&&e.target.closest('[data-act]');if(!b)return;
+  var a=b.dataset.act;
+  if(a==='kind'){S.kind=b.dataset.k;saveSet();if(cur)cur.kind=b.dataset.k;render();return;}
+  if(a==='cam'){$('#fCam').click();return;}
+  if(a==='gal'){$('#fGal').click();return;}
+  if(a==='reset'){if(cur&&cur.url)URL.revokeObjectURL(cur.url);cur=null;render();return;}
+  if(a==='plantnet'){askPlantnet();return;}
+  if(a==='lens'){toLens();return;}
+  if(a==='verify'){var c=cur.cands[+b.dataset.i];verify(c.latin||c.name);return;}
+  if(a==='pick'){var p=cur.cands[+b.dataset.i];cur.name=p.name;cur.latin=p.latin||'';cur.src=p.src;render();toast('Название подставлено ниже');return;}
+  if(a==='addcand'){var v=($('#man').value||'').trim();if(!v)return;cur.cands.push({name:v,latin:'',score:0,src:'вручную'});render();return;}
+  if(a==='geo'){
+    if(!navigator.geolocation){toast('Геолокация недоступна');return;}
+    navigator.geolocation.getCurrentPosition(function(pos){cur.geo={lat:+pos.coords.latitude.toFixed(5),lon:+pos.coords.longitude.toFixed(5)};render();},function(){toast('Не удалось получить место. Проверьте разрешение.');},{timeout:12000,maximumAge:60000});
+    return;
+  }
+  if(a==='save'){
+    var obs={id:'o'+Date.now(),ts:Date.now(),name:(cur.name||'').trim()||'Без названия',latin:(cur.latin||'').trim(),kind:cur.kind,note:(cur.note||'').trim(),geo:cur.geo,photo:cur.blob,src:cur.src};
+    tx('readwrite',function(s){return s.put(obs);}).then(loadDiary).then(function(){if(cur&&cur.url)URL.revokeObjectURL(cur.url);cur=null;toast('Сохранено в дневник');setView('diary');}).catch(function(){toast('Не удалось сохранить. Возможно, нет места на устройстве.');});
+    return;
+  }
+  if(a==='del'){
+    var id=b.dataset.id;
+    if(confirmId!==id){confirmId=id;renderDiary();setTimeout(function(){if(confirmId===id){confirmId=null;if(view==='diary')renderDiary();}},4000);return;}
+    confirmId=null;tx('readwrite',function(s){return s.delete(id);}).then(loadDiary).then(render);return;
+  }
+  if(a==='exp'){
+    var txt=JSON.stringify(diary.map(function(o){return {date:new Date(o.ts).toISOString().slice(0,10),name:o.name,latin:o.latin,kind:o.kind,note:o.note,geo:o.geo};}),null,1);
+    if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(txt).then(function(){toast('Список скопирован, без фото');},function(){toast('Не удалось скопировать');});
+    else toast('Копирование недоступно');
+    return;
+  }
+  if(a==='saveset'){S.pnKey=($('#pnKey').value||'').trim();S.online=$('#onl').checked;saveSet();toast('Настройки сохранены');return;}
+  if(a==='install'){if(deferredInstall){deferredInstall.prompt();deferredInstall=null;render();}return;}
+});
+document.addEventListener('input',function(e){
+  var id=e.target.id;
+  if(cur){if(id==='sName')cur.name=e.target.value;else if(id==='sLat')cur.latin=e.target.value;else if(id==='sNote')cur.note=e.target.value;}
+  if(id==='dq'){dq=e.target.value;var p=e.target.selectionStart;renderDiary();var q=$('#dq');q.focus();try{q.setSelectionRange(p,p);}catch(x){}}
+});
+$('#fCam').addEventListener('change',function(e){onFile(e.target.files[0]);e.target.value='';});
+$('#fGal').addEventListener('change',function(e){onFile(e.target.files[0]);e.target.value='';});
+window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();deferredInstall=e;if(view==='set')renderSet();});
+if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('./sw.js').catch(function(){});});}
+
+loadDiary().then(render);
+render();
+})();
+</script>
+</body>
+</html>
